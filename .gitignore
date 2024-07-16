@@ -1,0 +1,12 @@
+# folders
+.venv
+.terraform
+python
+.idea
+
+# files
+*.zip
+*.hcl
+.DS_Store
+.env
+*.json
