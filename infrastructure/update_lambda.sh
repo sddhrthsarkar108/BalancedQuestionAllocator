@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Input variables
-s3_bucket="question_allocator-poc"
+s3_bucket="question-allocator-lambda-poc"
 zip_file_key="lambda/handler.zip"
 function_name="question_allocator_lambda"
 local_zip_file="lambda/handler.zip"

@@ -4,8 +4,10 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket = "question_allocator_poc"
-    key    = "tf-state"
-    region = "us-east-1"
+    bucket         = "bal-ques-alloc-tf-st-bucket"
+    key            = "path/to/your/terraform.tfstate"
+    region         = "ap-south-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
   }
 }

@@ -70,7 +70,7 @@ def lambda_handler(event, context):
             "headers": {
                 "Content-Type": "application/json",
             },
-            "body": json.dumps(llm_output.model_dump_json()),
+            "body": llm_output.model_dump_json(),
         }
     except Exception as e:
         error_message = str(e)

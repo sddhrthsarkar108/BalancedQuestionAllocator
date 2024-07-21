@@ -1,18 +1,18 @@
 # get s3 bucket details
-data "aws_s3_bucket" "storage" {
+resource "aws_s3_bucket" "storage" {
   bucket = "question-allocator-lambda-poc"
 }
 
 # create and upload lambda zip to s3
-# data "archive_file" "lambda_handler" {
-#   type = "zip"
+data "archive_file" "lambda_handler" {
+  type = "zip"
 
-#   source_dir  = "${path.module}/../lambda/handler"
-#   output_path = "${path.module}/lambda/handler.zip"
-# }
+  source_dir  = "${path.module}/../lambda/handler"
+  output_path = "${path.module}/lambda/handler.zip"
+}
 
 resource "aws_s3_object" "lambda_handler" {
-  bucket = data.aws_s3_bucket.storage.id
+  bucket = aws_s3_bucket.storage.id
 
   key    = "lambda/handler.zip"
   source = "${path.module}/lambda/handler.zip"
@@ -21,33 +21,33 @@ resource "aws_s3_object" "lambda_handler" {
 }
 
 # create and upload lambda layer zip to s3
-# resource "terraform_data" "lambda_layer" {
-#   input = filebase64sha256("${path.module}/../lambda/layer/requirements.txt")
+resource "terraform_data" "lambda_layer" {
+  input = filebase64sha256("${path.module}/../lambda/layer/requirements.txt")
 
-#   provisioner "local-exec" {
-#     command = <<EOT
-#       mkdir python
-#       pip3 install --platform manylinux2014_x86_64 -t python/ --python-version 3.12 --only-binary=:all: -r ${path.module}/../lambda/layer/requirements.txt
-#       zip -r ${path.module}/lambda/layer.zip python/
-#     EOT
-#   }
-# }
+  provisioner "local-exec" {
+    command = <<EOT
+      pip3 install --platform manylinux2014_x86_64 -t python/ --python-version 3.12 --only-binary=:all: -r ${path.module}/../lambda/layer/requirements.txt
+      mkdir lambda 
+      zip -r ${path.module}/lambda/layer.zip python/
+    EOT
+  }
+}
 
 resource "aws_s3_object" "lambda_layer" {
-  bucket = data.aws_s3_bucket.storage.id
+  bucket = aws_s3_bucket.storage.id
 
   key    = "lambda/layer.zip"
   source = "${path.module}/lambda/layer.zip"
 
-  source_hash = filebase64sha256("${path.module}/lambda/layer.zip")
+  source_hash = filebase64sha256("${path.module}/../lambda/layer/requirements.txt")
 }
 
 resource "aws_lambda_layer_version" "lambda_layer" {
-  s3_bucket           = data.aws_s3_bucket.storage.id
+  s3_bucket           = aws_s3_bucket.storage.id
   s3_key              = aws_s3_object.lambda_layer.key
   layer_name          = "question_allocator_lambda_layer"
   compatible_runtimes = ["python3.12"]
-  source_code_hash    = filebase64sha256("${path.module}/lambda/layer.zip")
+  source_code_hash    = filebase64sha256("${path.module}/../lambda/layer/requirements.txt")
   depends_on          = [aws_s3_object.lambda_layer]
 }
 
@@ -77,7 +77,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 resource "aws_lambda_function" "lambda_handler" {
   function_name = "question_allocator_lambda"
 
-  s3_bucket = data.aws_s3_bucket.storage.id
+  s3_bucket = aws_s3_bucket.storage.id
   s3_key    = aws_s3_object.lambda_handler.key
 
   runtime = "python3.12"
@@ -86,7 +86,6 @@ resource "aws_lambda_function" "lambda_handler" {
   timeout = 360
 
   source_code_hash = filebase64sha256("${path.module}/lambda/handler.zip")
-
   role = aws_iam_role.lambda_exec.arn
 }
 
@@ -139,21 +138,6 @@ resource "aws_apigatewayv2_stage" "lambda_handler" {
   }
 }
 
-resource "aws_apigatewayv2_integration" "lambda_handler" {
-  api_id = aws_apigatewayv2_api.lambda_handler.id
-
-  integration_uri    = aws_lambda_function.lambda_handler.invoke_arn
-  integration_type   = "AWS_PROXY"
-  integration_method = "POST"
-}
-
-resource "aws_apigatewayv2_route" "lambda_handler" {
-  api_id = aws_apigatewayv2_api.lambda_handler.id
-
-  route_key = "GET /invoke"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_handler.id}"
-}
-
 resource "aws_apigatewayv2_integration" "lambda_handler_post" {
   api_id = aws_apigatewayv2_api.lambda_handler.id
 
@@ -166,6 +150,13 @@ resource "aws_apigatewayv2_route" "lambda_handler_post" {
   api_id = aws_apigatewayv2_api.lambda_handler.id
 
   route_key = "POST /invoke"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_handler_post.id}"
+}
+
+resource "aws_apigatewayv2_route" "lambda_handler_raw" {
+  api_id = aws_apigatewayv2_api.lambda_handler.id
+
+  route_key = "POST /invoke/raw"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_handler_post.id}"
 }
 

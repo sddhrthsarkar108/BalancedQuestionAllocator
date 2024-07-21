@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Input variables
-layer_name="question_allocator_layer"
+layer_name="question_allocator_lambda_layer"
 description="update lambda layer"
-s3_bucket="question_allocator-poc"
+s3_bucket="question-allocator-lambda-poc"
 zip_file_key="lambda/layer.zip"
 function_name="question_allocator_lambda"
-region="us-east-1"
+region="ap-south-1"
 account_id="975049981490"
 local_zip_file="lambda/layer.zip"
 

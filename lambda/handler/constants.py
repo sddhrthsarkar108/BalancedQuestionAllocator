@@ -1,5 +1,5 @@
 default_prompt_template = """Act as an Examiner setting questions for an exam on {subject} for {stream} students.
-    You will be provided with a set of {questions} as a question bank.
+    You will be provided with a set of questions as a question bank.
     Assign each question from the question bank to one or more chapters from the list provided below, following the given instructions:
 
     ### QUESTIONS:

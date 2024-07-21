@@ -1,0 +1,26 @@
+@bqa_host = https://mw04taq9j7.execute-api.ap-south-1.amazonaws.com/question_allocator_lambda_gw_stage
+
+POST {{bqa_host}}/invoke HTTP/1.1
+content-type: application/json
+
+{
+	"questions": [
+		"what is wildcard ?",
+		"when to use concurrent hashmap ?"
+	],
+	"subject": "Java Programming",
+	"stream": "Computer Science",
+	"chapters": [
+		"generics",
+		"collections",
+		"Threads",
+		"Concurrency"
+	]
+}
+
+###
+
+POST {{bqa_host}}/invoke/raw HTTP/1.1
+content-type: text/plain
+
+"Apple is in talks with Google for using Gemini to bring generative AI features to iPhones"
