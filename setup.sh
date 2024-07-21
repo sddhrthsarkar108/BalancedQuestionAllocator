@@ -115,4 +115,19 @@ setup_python_venv() {
 
 setup_python_venv
 
+# setup terraform
+echo -n "Do you want to run 'terraform init'? (y/n) [y]: "
+read terraform_init_choice
+terraform_init_choice=${terraform_init_choice:-"y"}
+case "$terraform_init_choice" in
+  y|Y )
+      echo "Running 'terraform init'..."
+      cd infrastructure
+      terraform init
+      cd ..
+      ;;
+  n|N ) ;;
+  * ) echo "Invalid input. Please enter y or n."; exit 1;;
+esac
+
 echo "Setup completed successfully."

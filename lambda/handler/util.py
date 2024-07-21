@@ -33,8 +33,6 @@ def unwrap_query_params(event):
 
     if query_params is None:
         query_params = {}
-    else:
-        query_params = json.loads(query_params)
 
     llm_model_id = query_params.get("llm_model_id", "anthropic")
     llm_model_version = query_params.get("llm_model_version", "claude-3-sonnet-20240229-v1:0")

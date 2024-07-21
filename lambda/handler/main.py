@@ -88,7 +88,9 @@ def handle_raw_call(llm: ChatBedrock, prompt: str):
     }
 
 
-if __name__ == "__main__":
+# uncomment to debug code locally
+# if __name__ == "__main__":
+    # TO DEBUG RAW CALL
     # queryParams = {"debug": "true"}
     # event = {
     #     "queryStringParameters": queryParams,
@@ -97,23 +99,24 @@ if __name__ == "__main__":
     # }
     # print(lambda_handler(event, None))
 
-    body = {
-        "questions": [
-            "what is wildcard ?",
-            "what is concurrent hash map ?"
-        ],
-        "subject": "Java Programming",
-        "stream": "Computer Science",
-        "chapters": [
-            "Generics",
-            "Collections"
-        ]
-    }
-    queryParams = {"debug": "false"}
+    #  TO DEBUG NON RWA CALL
+    # body = {
+    #     "questions": [
+    #         "what is wildcard ?",
+    #         "what is concurrent hash map ?"
+    #     ],
+    #     "subject": "Java Programming",
+    #     "stream": "Computer Science",
+    #     "chapters": [
+    #         "Generics",
+    #         "Collections"
+    #     ]
+    # }
+    # queryParams = {"debug": "false"}
 
-    event = {
-        "queryStringParameters": json.dumps(queryParams),
-        "body": json.dumps(body),
-        "requestContext": {"path": ""},
-    }
-    print(lambda_handler(event, None))
+    # event = {
+    #     "queryStringParameters": queryParams,
+    #     "body": json.dumps(body),
+    #     "requestContext": {"path": ""},
+    # }
+    # print(lambda_handler(event, None))
